@@ -203,7 +203,7 @@ export default function Nav({
                                 <div className="my-1 border-t border-border" />
 
                                 <MenuLink
-                                    href={profilePath(user)}
+                                    href={profilePath(user as any)}
                                     icon={<LuUser className="size-4" />}
                                     label="Profile"
                                     onNavigate={() => setMenuOpen(false)}

@@ -24,7 +24,7 @@ export default function VerificationPage() {
 
     const back = () => {
         if (window.history.length > 1) router.back();
-        else router.push(session?.user ? profilePath(session.user) : "/");
+        else router.push(session?.user ? profilePath(session.user as any) : "/");
     };
 
     const setGold = async (on: boolean) => {
