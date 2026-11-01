@@ -1,7 +1,7 @@
-// app/api/users/[username]/route.ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { postQueryFields, toPost } from "@/lib/post-query";
+import { auth } from "@/lib/auth/auth";
+import { db } from "@/lib/db/db";
+import { postQueryFields, toPost } from "@/lib/post/post-query";
+import { isModSql } from "@/lib/db/user-sql";
 import { follows, posts, user } from "@/schema";
 import { desc, eq, or, sql } from "drizzle-orm";
 import { headers } from "next/headers";
@@ -25,6 +25,7 @@ export async function GET(
             banner: user.banner,
             verified: user.verified,
             gold: sql<boolean>`(${user.goldPermission} and ${user.goldEnabled})`,
+            mod: isModSql,
             createdAt: user.createdAt,
             followers: sql<number>`(select count(*)::int from ${follows} where ${follows.followingId} = ${user.id})`,
             following: sql<number>`(select count(*)::int from ${follows} where ${follows.followerId} = ${user.id})`,
@@ -65,6 +66,7 @@ export async function GET(
                 banner: profile.banner ?? null,
                 verified: profile.verified,
                 gold: profile.gold,
+                mod: Boolean(profile.mod),
                 createdAt: profile.createdAt.toISOString(),
                 isOwner: viewerId === profile.id,
                 followers: Number(profile.followers) || 0,

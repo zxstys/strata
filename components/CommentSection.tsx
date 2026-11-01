@@ -4,10 +4,10 @@
 import Avatar from "@/components/Avatar";
 import MediaInput from "@/components/MediaInput";
 import { UserName } from "@/components/UserName";
-import { authClient } from "@/lib/auth-client";
-import { adjustCommentCount, commentClient, useComments } from "@/lib/comment-client";
+import { authClient } from "@/lib/auth/auth-client";
+import { adjustCommentCount, commentClient, useComments } from "@/lib/comment/comment-client";
 import { timeAgo } from "@/lib/time";
-import { uploadMedia } from "@/lib/upload-client";
+import { uploadMedia } from "@/lib/post/upload-client";
 import type { PostComment } from "@/types/comment";
 import Link from "next/link";
 import { useState } from "react";

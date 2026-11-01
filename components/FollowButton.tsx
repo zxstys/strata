@@ -1,7 +1,7 @@
 // components/FollowButton.tsx
 "use client";
 
-import { followClient } from "@/lib/follow-client";
+import { followClient } from "@/lib/follow/follow-client";
 import { useState } from "react";
 
 export default function FollowButton({

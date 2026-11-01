@@ -1,10 +1,10 @@
 // app/api/posts/[...all]/route.ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { commentQueryFields, isUuid, toComment } from "@/lib/comment-query";
-import { isBlobUrl, isGifUrl } from "@/lib/media";
-import { postQueryFields, toPost } from "@/lib/post-query";
-import { checkPostText, FREE_POST_LIMIT } from "@/lib/post-rules";
+import { auth } from "@/lib/auth/auth";
+import { db } from "@/lib/db/db";
+import { commentQueryFields, isUuid, toComment } from "@/lib/comment/comment-query";
+import { isBlobUrl, isGifUrl } from "@/lib/post/media";
+import { postQueryFields, toPost } from "@/lib/post/post-query";
+import { checkPostText, FREE_POST_LIMIT } from "@/lib/post/post-rules";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { and, asc, desc, eq, isNotNull, or, sql } from "drizzle-orm";

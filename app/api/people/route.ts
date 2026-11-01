@@ -1,6 +1,6 @@
-// app/api/people/route.ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { auth } from "@/lib/auth/auth";
+import { db } from "@/lib/db/db";
+import { isModSql } from "@/lib/db/user-sql";
 import { follows, user } from "@/schema";
 import { desc, ne, sql } from "drizzle-orm";
 import { headers } from "next/headers";
@@ -18,6 +18,7 @@ export async function GET() {
             image: user.image,
             verified: user.verified,
             gold: sql<boolean>`(${user.goldPermission} and ${user.goldEnabled})`,
+            mod: isModSql,
             isFollowing: viewerId
                 ? sql<boolean>`exists (
             select 1 from ${follows}
@@ -36,6 +37,7 @@ export async function GET() {
             ...r,
             image: r.image ?? null,
             gold: Boolean(r.gold),
+            mod: Boolean(r.mod),
             isFollowing: Boolean(r.isFollowing),
         })),
         { status: 200 }

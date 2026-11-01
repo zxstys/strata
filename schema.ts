@@ -85,17 +85,47 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-export const posts = pgTable("posts", {
-  uuid: uuid("uuid").notNull().unique().defaultRandom(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  mediaUrl: text("media_url"),
-  content: text("content").notNull(),
-  pinnedAt: timestamp("pinned_at"),
-  editedAt: timestamp("edited_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+// schema.ts
+export const posts = pgTable(
+  "posts",
+  {
+    uuid: uuid("uuid").notNull().unique().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    content: text("content").notNull(),
+    mediaUrl: text("media_url"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    pinnedAt: timestamp("pinned_at"),
+    editedAt: timestamp("edited_at"),
+  },
+  (t) => [
+    index("posts_created_at_idx").on(t.createdAt),
+    index("posts_user_id_idx").on(t.userId),
+  ]
+);
+
+export const supportTickets = pgTable(
+  "support_tickets",
+  {
+    uuid: uuid("uuid").notNull().unique().defaultRandom(),
+    userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+    contactEmail: text("contact_email"),
+    type: text("type").notNull(),
+    subject: text("subject").notNull(),
+    message: text("message").notNull(),
+    status: text("status").notNull().default("open"),
+    adminNote: text("admin_note"),
+    handledBy: text("handled_by"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("support_status_created_idx").on(t.status, t.createdAt),
+    index("support_user_idx").on(t.userId),
+    index("support_email_idx").on(t.contactEmail),
+  ]
+);
 
 export const postLikes = pgTable(
   "post_likes",

@@ -3,22 +3,25 @@
 import { useRouter } from "next/navigation";
 import Nav from "@/components/Nav";
 import PostCard from "@/components/PostCard";
-import { authClient } from "@/lib/auth-client";
-import { postClient, usePost } from "@/lib/post-client";
+import { authClient } from "@/lib/auth/auth-client";
+import { postClient, usePost } from "@/lib/post/post-client";
 import type { Post } from "@/types/post";
 import Link from "next/link";
 import { use } from "react";
 import { LuArrowLeft } from "react-icons/lu";
 
+import { useState } from "react"; // was: import { use } from "react"; (remove this line if it only had use)
+
 export default function PostView({
-    params,
+    uuid,
+    initial,
 }: {
-    params: Promise<{ uuid: string }>;
+    uuid: string;
+    initial: Post | null;
 }) {
     const router = useRouter();
-    const { uuid } = use(params);
     const { data: session } = authClient.useSession();
-    const { data: post, error, isLoading, mutate } = usePost(uuid);
+    const { data: post, error, isLoading, mutate } = usePost(uuid, initial);
 
     const likePost = async (p: Post) => {
         try {

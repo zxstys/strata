@@ -6,9 +6,9 @@ import FollowButton from "@/components/FollowButton";
 import Nav from "@/components/Nav";
 import PostCard from "@/components/PostCard";
 import { VerifiedBadge } from "@/components/UserName";
-import { authClient } from "@/lib/auth-client";
-import { postClient } from "@/lib/post-client";
-import { useUser } from "@/lib/user-client";
+import { authClient } from "@/lib/auth/auth-client";
+import { postClient } from "@/lib/post/post-client";
+import { useUser } from "@/lib/user/user-client";
 import type { Post } from "@/types/post";
 import Link from "next/link";
 import { use } from "react";
@@ -97,7 +97,11 @@ export default function UserProfile({
                                 <div className="mt-3 flex flex-col gap-1 px-1">
                                     <h1 className="flex items-center gap-1.5 text-xl font-semibold tracking-tight">
                                         {data.user.name}
-                                        <VerifiedBadge verified={data.user.verified} gold={data.user.gold} />
+                                        <VerifiedBadge
+                                            verified={data.user.verified}
+                                            gold={data.user.gold}
+                                            mod={data.user.mod}
+                                        />
                                     </h1>
                                     {data.user.username && (
                                         <p className="font-mono text-sm text-muted-foreground">

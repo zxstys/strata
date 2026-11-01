@@ -1,7 +1,7 @@
 // app/api/profile/route.ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { isBlobUrl } from "@/lib/media";
+import { auth } from "@/lib/auth/auth";
+import { db } from "@/lib/db/db";
+import { isBlobUrl } from "@/lib/post/media";
 import { user } from "@/schema";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";

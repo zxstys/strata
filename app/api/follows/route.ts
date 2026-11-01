@@ -1,6 +1,6 @@
-// app/api/follows/route.ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { auth } from "@/lib/auth/auth";
+import { db } from "@/lib/db/db";
+import { isModSql } from "@/lib/db/user-sql";
 import { follows, user } from "@/schema";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { headers } from "next/headers";
@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
             image: user.image,
             verified: user.verified,
             gold: sql<boolean>`(${user.goldPermission} and ${user.goldEnabled})`,
+            mod: isModSql,
         })
         .from(follows)
         .innerJoin(
@@ -55,7 +56,12 @@ export async function GET(request: NextRequest) {
         .limit(100);
 
     return NextResponse.json(
-        rows.map((r) => ({ ...r, image: r.image ?? null })),
+        rows.map((r) => ({
+            ...r,
+            image: r.image ?? null,
+            gold: Boolean(r.gold),
+            mod: Boolean(r.mod),
+        })),
         { status: 200 }
     );
 }

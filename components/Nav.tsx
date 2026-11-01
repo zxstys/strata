@@ -2,10 +2,10 @@
 "use client";
 
 import Avatar from "@/components/Avatar";
-import type { auth } from "@/lib/auth";
-import { authClient } from "@/lib/auth-client";
-import { profilePath } from "@/lib/profile-link";
-import { useSearch } from "@/lib/search-client";
+import type { auth } from "@/lib/auth/auth";
+import { authClient } from "@/lib/auth/auth-client";
+import { profilePath } from "@/lib/post/profile-link";
+import { useSearch } from "@/lib/post/search-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";

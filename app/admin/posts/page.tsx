@@ -4,8 +4,8 @@
 
 import Avatar from "@/components/Avatar";
 import Pager from "@/components/admin/Pager";
-import { adminFetch } from "@/lib/admin-client";
-import { fetcher } from "@/lib/fetcher";
+import { adminFetch } from "@/lib/admin/admin-client";
+import { fetcher } from "@/lib/api/fetcher";
 import type { Post } from "@/types/post";
 import Link from "next/link";
 import { useState } from "react";

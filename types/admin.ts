@@ -1,13 +1,29 @@
 // types/admin.ts
+export type Day = { day: string; value: number };
+
 export type AdminStats = {
-    users: number;
-    admins: number;
-    verified: number;
-    goldPermitted: number;
-    posts: number;
-    postsToday: number;
-    comments: number;
-    likes: number;
+    totals: {
+        users: number;
+        admins: number;
+        verified: number;
+        goldPermitted: number;
+        posts: number;
+        postsToday: number;
+        replies: number;
+        likes: number;
+    };
+    series: {
+        users: Day[];
+        posts: Day[];
+        replies: Day[];
+        likes: Day[];
+    };
+    mix: {
+        admins: number;
+        verified: number;
+        goldOnly: number;
+        regular: number;
+    };
 };
 
 export type AdminUser = {

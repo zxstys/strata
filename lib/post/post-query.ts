@@ -2,6 +2,7 @@
 import { sql } from "drizzle-orm";
 import { comments, postLikes, posts, user } from "@/schema";
 import type { Post } from "@/types/post";
+import { isModSql } from "../db/user-sql";
 
 export function postQueryFields(viewerId: string | null) {
     return {
@@ -35,6 +36,7 @@ export function postQueryFields(viewerId: string | null) {
         mine: viewerId
             ? sql<boolean>`${posts.userId} = ${viewerId}`
             : sql<boolean>`false`,
+        authorMod: isModSql,
     };
 }
 
@@ -54,6 +56,7 @@ type PostRow = {
     likes: number;
     likedByMe: boolean;
     commentCount: number;
+    authorMod: boolean;
     mine: boolean;
 };
 
@@ -70,6 +73,7 @@ export function toPost(r: PostRow): Post {
             image: r.authorImage ?? null,
             verified: r.authorVerified,
             gold: r.authorGold,
+            mod: Boolean(r.authorMod),
         },
         likes: Number(r.likes) || 0,
         likedByMe: Boolean(r.likedByMe),

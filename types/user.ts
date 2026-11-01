@@ -2,6 +2,7 @@
 import type { Post } from "@/types/post";
 
 export type UserProfile = {
+    mod: boolean | undefined;
     id: string;
     name: string;
     username: string | null;

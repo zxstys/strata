@@ -6,11 +6,11 @@ import { LuArrowLeft, LuBadgeCheck } from "react-icons/lu";
 
 import Avatar from "@/components/Avatar";
 import ImageEditor from "@/components/ImageEditor";
-import { authClient } from "@/lib/auth-client";
-import { fetcher } from "@/lib/fetcher";
-import { profilePath } from "@/lib/profile-link";
-import { uploadMedia } from "@/lib/upload-client";
-import { normalizeUsername, validateUsername } from "@/lib/username";
+import { authClient } from "@/lib/auth/auth-client";
+import { fetcher } from "@/lib/api/fetcher";
+import { profilePath } from "@/lib/post/profile-link";
+import { uploadMedia } from "@/lib/post/upload-client";
+import { normalizeUsername, validateUsername } from "@/lib/user/username";
 import type { MyProfile } from "@/types/user";
 import Link from "next/link";
 import { useEffect, useState } from "react";

@@ -7,7 +7,7 @@ import {
     layout,
     renderCrop,
     type Crop,
-} from "@/lib/image-crop";
+} from "@/lib/post/image-crop";
 import { useEffect, useRef, useState } from "react";
 import { LuX } from "react-icons/lu";
 

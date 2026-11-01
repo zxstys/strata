@@ -4,8 +4,8 @@
 import Avatar from "@/components/Avatar";
 import FollowButton from "@/components/FollowButton";
 import { UserName } from "@/components/UserName";
-import { profilePath } from "@/lib/profile-link";
-import { usePeople } from "@/lib/search-client";
+import { profilePath } from "@/lib/post/profile-link";
+import { usePeople } from "@/lib/post/search-client";
 import Link from "next/link";
 
 export default function PeopleStrip() {

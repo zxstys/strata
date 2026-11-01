@@ -1,8 +1,7 @@
-// app/api/admin/posts/route.ts
-import { forbidden, getAdminSession } from "@/lib/admin";
-import { isUuid } from "@/lib/comment-query";
-import { db } from "@/lib/db";
-import { postQueryFields, toPost } from "@/lib/post-query";
+import { forbidden, getStaffSession } from "@/lib/admin/admin";
+import { isUuid } from "@/lib/comment/comment-query";
+import { db } from "@/lib/db/db";
+import { postQueryFields, toPost } from "@/lib/post/post-query";
 import { posts, user } from "@/schema";
 import { desc, eq, ilike, or } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
@@ -11,8 +10,8 @@ const PAGE_SIZE = 20;
 const escapeLike = (s: string) => s.replace(/[%_\\]/g, "\\$&");
 
 export async function GET(request: NextRequest) {
-    const admin = await getAdminSession();
-    if (!admin) return forbidden();
+    const staff = await getStaffSession();
+    if (!staff) return forbidden();
 
     const q = request.nextUrl.searchParams.get("q")?.trim() ?? "";
     const page = Math.max(Number(request.nextUrl.searchParams.get("page")) || 1, 1);
@@ -23,7 +22,7 @@ export async function GET(request: NextRequest) {
         : undefined;
 
     const rows = await db
-        .select(postQueryFields(admin.id))
+        .select(postQueryFields(staff.id))
         .from(posts)
         .innerJoin(user, eq(posts.userId, user.id))
         .where(where)
@@ -38,10 +37,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-    const admin = await getAdminSession();
-    if (!admin) return forbidden();
+    const staff = await getStaffSession();
+    if (!staff) return forbidden();
 
-    const { uuid } = await request.json();
+    const body = await request.json().catch(() => null);
+    const uuid = body?.uuid;
     if (!isUuid(uuid)) {
         return NextResponse.json({ message: "Invalid post id." }, { status: 400 });
     }

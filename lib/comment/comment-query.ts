@@ -2,6 +2,7 @@
 import { sql } from "drizzle-orm";
 import { comments, user } from "@/schema";
 import type { PostComment } from "@/types/comment";
+import { isModSql } from "../db/user-sql";
 
 export const isUuid = (v: unknown): v is string =>
     typeof v === "string" &&
@@ -22,6 +23,7 @@ export function commentQueryFields(viewerId: string | null) {
         canDelete: viewerId
             ? sql<boolean>`${comments.userId} = ${viewerId}`
             : sql<boolean>`false`,
+        authorMod: isModSql,
     };
 }
 
@@ -37,6 +39,7 @@ type CommentRow = {
     authorVerified: boolean;
     authorGold: boolean;
     canDelete: boolean;
+    authorMod: boolean;
 };
 
 export function toComment(r: CommentRow): PostComment {
@@ -52,6 +55,7 @@ export function toComment(r: CommentRow): PostComment {
             image: r.authorImage ?? null,
             verified: r.authorVerified,
             gold: r.authorGold,
+            mod: r.authorMod
         },
         canDelete: r.canDelete,
     };

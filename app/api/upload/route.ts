@@ -1,5 +1,5 @@
-import { auth } from "@/lib/auth";
-import { storeFile } from "@/lib/storage";
+import { auth } from "@/lib/auth/auth";
+import { storeFile } from "@/lib/post/storage";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 

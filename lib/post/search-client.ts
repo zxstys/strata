@@ -1,14 +1,17 @@
 // lib/search-client.ts
-import { fetcher } from "@/lib/fetcher";
+import { api } from "@/lib/api/api";
 import type { PersonCard, SearchResult } from "@/types/search";
 import useSWR from "swr";
 
 export const useSearch = (q: string) =>
     useSWR<SearchResult>(
         q ? `/api/search?q=${encodeURIComponent(q)}` : null,
-        fetcher,
+        (url: string) => api.get<SearchResult>(url),
         { keepPreviousData: true }
     );
 
 export const usePeople = () =>
-    useSWR<PersonCard[]>("/api/people", fetcher);
+    useSWR<PersonCard[]>(
+        "/api/people",
+        (url: string) => api.get<PersonCard[]>(url)
+    );

@@ -2,14 +2,20 @@
 "use client";
 
 import Avatar from "@/components/Avatar";
-import CommentSection from "@/components/CommentSection";
+// import CommentSection from "@/components/CommentSection";
+const CommentSection = dynamic(() => import("@/components/CommentSection"), {
+    loading: () => <p className="mt-3 text-sm text-muted-foreground">Loading replies...</p>,
+});
+
 import { UserName } from "@/components/UserName";
-import { postClient, refreshPostLists } from "@/lib/post-client";
-import { usePostLimit } from "@/lib/post-limit-client";
-import { checkPostText } from "@/lib/post-rules";
+import { postClient, refreshPostLists } from "@/lib/post/post-client";
+import { usePostLimit } from "@/lib/post/post-limit-client";
+import { checkPostText } from "@/lib/post/post-rules";
 import { timeAgo } from "@/lib/time";
 import type { Post } from "@/types/post";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import { profilePath } from "@/lib/post/profile-link";
 import { useEffect, useRef, useState } from "react";
 import {
     LuEllipsis,

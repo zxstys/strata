@@ -6,6 +6,7 @@ export type Author = {
     image: string | null;
     verified: boolean;
     gold: boolean;
+    mod: boolean;
 };
 
 export type Post = {

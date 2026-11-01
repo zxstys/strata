@@ -1,19 +1,19 @@
 // components/VerifiedBadge.tsx
-
-export type BadgeKind = "blue" | "gold";
+export type BadgeKind = "blue" | "gold" | "mod";
 
 const LABEL: Record<BadgeKind, string> = {
     blue: "Verified",
     gold: "Gold verified",
+    mod: "Moderator",
 };
 
 const FILL: Record<BadgeKind, string> = {
     blue: "fill-sky-500",
     gold: "fill-amber-500",
+    mod: "",
 };
 
-// Builds a scalloped circle: a radius that rises and falls around the
-// circumference. 10 waves and a moderate amplitude give the X-style edge.
+// Scalloped circle: the radius rises and falls around the circumference.
 function buildScallop(waves = 10, radius = 9.6, amplitude = 0.7, steps = 160) {
     const c = 12;
     let d = "";
@@ -28,6 +28,7 @@ function buildScallop(waves = 10, radius = 9.6, amplitude = 0.7, steps = 160) {
 }
 
 const SCALLOP_PATH = buildScallop();
+const MOD_GRADIENT_ID = "strata-mod-gradient";
 
 export function BadgeIcon({
     kind,
@@ -44,7 +45,19 @@ export function BadgeIcon({
             className={`inline-block shrink-0 align-[-0.125em] ${className || "size-4"}`}
         >
             <title>{LABEL[kind]}</title>
-            <path d={SCALLOP_PATH} className={FILL[kind]} />
+            {kind === "mod" && (
+                <defs>
+                    <linearGradient id={MOD_GRADIENT_ID} x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stopColor="#a855f7" />
+                        <stop offset="1" stopColor="#ec4899" />
+                    </linearGradient>
+                </defs>
+            )}
+            <path
+                d={SCALLOP_PATH}
+                className={FILL[kind]}
+                fill={kind === "mod" ? `url(#${MOD_GRADIENT_ID})` : undefined}
+            />
             <path
                 d="M7.6 12.4l2.9 2.9 5.9-6.1"
                 fill="none"

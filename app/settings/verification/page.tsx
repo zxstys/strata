@@ -2,9 +2,9 @@
 "use client";
 
 import { BadgeIcon } from "@/components/VerifiedBadge";
-import { authClient } from "@/lib/auth-client";
-import { fetcher } from "@/lib/fetcher";
-import { profilePath } from "@/lib/profile-link";
+import { authClient } from "@/lib/auth/auth-client";
+import { fetcher } from "@/lib/api/fetcher";
+import { profilePath } from "@/lib/post/profile-link";
 import type { MyProfile } from "@/types/user";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

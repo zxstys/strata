@@ -4,8 +4,8 @@
 import Avatar from "@/components/Avatar";
 import Nav from "@/components/Nav";
 import { UserName } from "@/components/UserName";
-import { authClient } from "@/lib/auth-client";
-import { fetcher } from "@/lib/fetcher";
+import { authClient } from "@/lib/auth/auth-client";
+import { fetcher } from "@/lib/api/fetcher";
 import Link from "next/link";
 import { use } from "react";
 import useSWR from "swr";

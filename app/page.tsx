@@ -6,25 +6,24 @@ import MediaInput from "@/components/MediaInput";
 import Nav from "@/components/Nav";
 import PeopleStrip from "@/components/PeopleStrip";
 import PostCard from "@/components/PostCard";
-import { authClient } from "@/lib/auth-client";
-import { postClient } from "@/lib/post-client";
-import { usePostLimit } from "@/lib/post-limit-client";
-import { checkPostText } from "@/lib/post-rules";
-import { uploadMedia } from "@/lib/upload-client";
+import { authClient } from "@/lib/auth/auth-client";
+import { postClient, usePosts } from "@/lib/post/post-client";
+import { usePostLimit } from "@/lib/post/post-limit-client";
+import { checkPostText } from "@/lib/post/post-rules";
+import { uploadMedia } from "@/lib/post/upload-client";
 import type { Post } from "@/types/post";
 import { useState } from "react";
 
 export default function Home() {
   const { data: session } = authClient.useSession();
   const limit = usePostLimit();
+  const { data, error, isLoading, mutate } = usePosts();
+  const posts = data ?? [];
 
   const [content, setContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [posting, setPosting] = useState(false);
   const [postError, setPostError] = useState("");
-
-  const { data, error, isLoading, mutate } = postClient.all();
-  const posts = data ?? [];
 
   const createPost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,13 +68,13 @@ export default function Home() {
         <Nav session={session} wide />
 
         <div className="flex flex-col gap-6 px-4 py-6 lg:grid lg:grid-cols-[minmax(0,36rem)_16rem] lg:justify-center lg:gap-8 lg:px-0">
-          {/* People: top on mobile, right sidebar on desktop */}
           <aside className="order-first lg:order-last lg:sticky lg:top-20 lg:self-start">
             <PeopleStrip />
           </aside>
 
-          {/* Feed */}
           <div className="flex min-w-0 flex-col gap-6">
+            <h1 className="sr-only">Strata: latest posts and people</h1>
+
             <form
               onSubmit={createPost}
               className="flex flex-col gap-2 rounded-lg border border-border p-4"
@@ -86,15 +85,16 @@ export default function Home() {
                 onChange={(e) => setContent(e.target.value)}
                 maxLength={limit ?? undefined}
                 rows={3}
-                className="w-full resize-none p-4 bg-transparent text-sm placeholder:text-muted-foreground focus:outline-none"
+                className="w-full p-4 resize-none bg-transparent text-sm placeholder:text-muted-foreground focus:outline-none"
               />
 
               {limit !== null && content.length > limit * 0.8 && (
                 <p
-                  className={`text-right text-xs ${content.length >= limit
+                  className={`text-right text-xs ${
+                    content.length >= limit
                       ? "text-destructive"
                       : "text-muted-foreground"
-                    }`}
+                  }`}
                 >
                   {limit - content.length}
                 </p>
@@ -124,9 +124,7 @@ export default function Home() {
               </div>
             </form>
 
-            {error && (
-              <p className="text-sm text-red-500">Failed to load posts.</p>
-            )}
+            {error && <p className="text-sm text-red-500">Failed to load posts.</p>}
             {isLoading && (
               <p className="text-sm text-muted-foreground">Loading posts...</p>
             )}

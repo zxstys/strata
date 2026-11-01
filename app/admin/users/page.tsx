@@ -3,8 +3,8 @@
 
 import Avatar from "@/components/Avatar";
 import Pager from "@/components/admin/Pager";
-import { adminFetch } from "@/lib/admin-client";
-import { fetcher } from "@/lib/fetcher";
+import { adminFetch } from "@/lib/admin/admin-client";
+import { fetcher } from "@/lib/api/fetcher";
 import type { AdminUser } from "@/types/admin";
 import { useState } from "react";
 import useSWR from "swr";
@@ -31,6 +31,14 @@ export default function AdminUsers() {
     const changeQuery = (value: string) => {
         setQ(value);
         setPage(1);
+    };
+
+    const setRole = (u: AdminUser, role: "user" | "mod" | "admin") => {
+        if (role === (u.role ?? "user")) return;
+        if (u.role === "admin" && role !== "admin" && !confirm(`Remove admin access from ${u.name}?`)) {
+            return;
+        }
+        update(u, { role }, `Role set to ${role}.`);
     };
 
     const update = async (u: AdminUser, body: Record<string, unknown>, success: string) => {
@@ -93,38 +101,17 @@ export default function AdminUsers() {
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                            <button
-                                aria-pressed={u.role === "admin"}
+                            <select
+                                aria-label={`Role for ${u.name}`}
+                                value={u.role ?? "user"}
                                 disabled={busyId === u.id}
-                                onClick={() => toggleAdmin(u)}
-                                className={pill(u.role === "admin")}
+                                onChange={(e) => setRole(u, e.target.value as "user" | "mod" | "admin")}
+                                className="h-8 rounded-md border border-border bg-background px-2 text-xs"
                             >
-                                Admin
-                            </button>
-                            <button
-                                aria-pressed={u.verified}
-                                disabled={busyId === u.id}
-                                onClick={() =>
-                                    update(u, { verified: !u.verified }, u.verified ? "Verification removed." : "Verified.")
-                                }
-                                className={pill(u.verified)}
-                            >
-                                Verified
-                            </button>
-                            <button
-                                aria-pressed={u.goldPermission}
-                                disabled={busyId === u.id}
-                                onClick={() =>
-                                    update(
-                                        u,
-                                        { goldPermission: !u.goldPermission },
-                                        u.goldPermission ? "Gold access removed." : "Gold access granted."
-                                    )
-                                }
-                                className={pill(u.goldPermission)}
-                            >
-                                Gold access
-                            </button>
+                                <option value="user">User</option>
+                                <option value="mod">Moderator</option>
+                                <option value="admin">Admin</option>
+                            </select>
                         </div>
                     </li>
                 ))}

@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Field from "@/components/Field";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 
 export default function Register() {
     const [loading, setLoading] = useState(false);
