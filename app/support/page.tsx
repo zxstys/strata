@@ -2,8 +2,8 @@
 "use client";
 
 import Nav from "@/components/Nav";
+import StatusPill from "@/components/status/StatusPill";
 import NewRequestForm from "@/components/support/NewRequestForm";
-import StatusPill from "@/components/support/StatusPill";
 import TicketChat from "@/components/support/TicketChat";
 import { authClient } from "@/lib/auth/auth-client";
 import { TYPE_INFO } from "@/lib/support/support";
