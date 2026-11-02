@@ -25,3 +25,24 @@ export type QueueTicket = MyTicket & {
         role: string | null;
     } | null;
 };
+
+export type SupportMessage = {
+    id: string;
+    content: string;
+    isStaff: boolean;
+    senderId: string | null;
+    createdAt: string;
+};
+
+export type TicketDetail = {
+    ticket: {
+        uuid: string;
+        type: TicketType;
+        subject: string;
+        status: TicketStatus;
+        adminNote: string | null;
+        createdAt: string;
+        ownerId: string | null;
+    };
+    messages: SupportMessage[];
+};

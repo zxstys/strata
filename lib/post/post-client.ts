@@ -2,14 +2,15 @@
 import { api } from "@/lib/api/api";
 import type { Post } from "@/types/post";
 import useSWR, { mutate } from "swr";
+import { useApi } from "@/lib/api/use-api";
 
 const feedKey = (page: number) => `/api/posts/all/${page}`;
 const postKey = (uuid: string) => `/api/posts/one/${uuid}`;
 
-export const usePosts = (page = 1) => useSWR<Post[]>(feedKey(page));
+export const usePosts = (page = 1) => useApi<Post[]>(feedKey(page));
 
 export const usePost = (uuid: string | null, fallbackData?: Post | null) =>
-    useSWR<Post>(uuid ? postKey(uuid) : null, {
+    useApi<Post>(uuid ? postKey(uuid) : null, {
         fallbackData: fallbackData ?? undefined,
     });
 
@@ -24,7 +25,10 @@ export const postClient = {
 };
 
 const isPostCacheKey = (key: unknown) =>
-    typeof key === "string" && (key.startsWith("/api/posts/") || key.startsWith("/api/users/"));
+    typeof key === "string" &&
+    (key.startsWith("/api/posts/") ||
+        key.startsWith("/api/users/") ||
+        key.startsWith("/api/tags/"));
 
 // Revalidates every cached feed, profile, and single-post view.
 export const refreshPostLists = () => mutate(isPostCacheKey);

@@ -3,13 +3,14 @@ import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
+import { linkify } from "./Linkify";
 
 const heading: Components["h1"] = ({ children }) => (
-    <p className="mb-1 font-semibold">{children}</p>
+    <p className="mb-1 font-semibold">{linkify(children)}</p>
 );
 
 const components: Components = {
-    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+    p: ({ children }) => <p className="mb-2 last:mb-0">{linkify(children)}</p>,
     h1: heading,
     h2: heading,
     h3: heading,
@@ -33,7 +34,7 @@ const components: Components = {
     ),
     ul: ({ children }) => <ul className="mb-2 list-disc pl-5">{children}</ul>,
     ol: ({ children }) => <ol className="mb-2 list-decimal pl-5">{children}</ol>,
-    li: ({ children }) => <li className="mt-0.5">{children}</li>,
+    li: ({ children }) => <li className="mt-0.5">{linkify(children)}</li>,
     blockquote: ({ children }) => (
         <blockquote className="mb-2 border-l-2 border-border pl-3 text-muted-foreground">
             {children}

@@ -1,6 +1,7 @@
 // app/api/support/route.ts
 import { auth } from "@/lib/auth/auth";
 import { db } from "@/lib/db/db";
+import { push, STAFF_CHANNEL } from "@/lib/dm/pusher-server";
 import {
     isTicketType,
     OPEN_STATUSES,
@@ -127,6 +128,8 @@ export async function POST(request: NextRequest) {
             message,
         })
         .returning({ uuid: supportTickets.uuid });
+
+    await push(STAFF_CHANNEL, "ticket", { uuid: created.uuid });
 
     return NextResponse.json({ uuid: created.uuid }, { status: 201 });
 }

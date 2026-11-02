@@ -2,22 +2,22 @@
 "use client";
 
 import { BadgeIcon } from "@/components/VerifiedBadge";
+import { api } from "@/lib/api/api";
 import { authClient } from "@/lib/auth/auth-client";
-import { fetcher } from "@/lib/api/fetcher";
 import { profilePath } from "@/lib/post/profile-link";
+import { useApi } from "@/lib/api/use-api";
 import type { MyProfile } from "@/types/user";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LuArrowLeft } from "react-icons/lu";
-import useSWR from "swr";
 
 type Notice = { ok: boolean; text: string } | null;
 
 export default function VerificationPage() {
     const router = useRouter();
     const { data: session } = authClient.useSession();
-    const { data: me, error, mutate } = useSWR<MyProfile>("/api/profile", fetcher);
+    const { data: me, error, mutate } = useApi<MyProfile>("/api/profile");
 
     const [busy, setBusy] = useState(false);
     const [notice, setNotice] = useState<Notice>(null);
@@ -31,13 +31,7 @@ export default function VerificationPage() {
         setBusy(true);
         setNotice(null);
         try {
-            const res = await fetch("/api/profile", {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ goldEnabled: on }),
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.message ?? "Something went wrong.");
+            await api.patch("/api/profile", { goldEnabled: on });
             await mutate();
             setNotice({
                 ok: true,
@@ -74,7 +68,7 @@ export default function VerificationPage() {
 
     if (error) {
         return (
-            <div className="flex flex-col gap-6 max-w-xl mx-auto">
+            <div className="flex flex-col gap-6">
                 {topBar}
                 <p className="text-sm text-muted-foreground">
                     <Link href="/auth/login" className="font-medium text-foreground hover:underline">
@@ -88,7 +82,7 @@ export default function VerificationPage() {
 
     if (!me) {
         return (
-            <div className="flex flex-col gap-6 max-w-xl mx-auto">
+            <div className="flex flex-col gap-6">
                 {topBar}
                 <p className="text-sm text-muted-foreground">Loading...</p>
             </div>
@@ -98,7 +92,7 @@ export default function VerificationPage() {
     const goldShowing = me.goldPermission && me.goldEnabled;
 
     return (
-        <div className="flex flex-col gap-6 max-w-xl w-full mx-auto my-8">
+        <div className="flex flex-col gap-6">
             {topBar}
 
             <div>
@@ -108,7 +102,6 @@ export default function VerificationPage() {
                 </p>
             </div>
 
-            {/* Blue */}
             <section className="flex items-start justify-between gap-4 rounded-xl border border-border p-4">
                 <div className="flex gap-3">
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary">
@@ -138,7 +131,6 @@ export default function VerificationPage() {
                 </span>
             </section>
 
-            {/* Gold */}
             <section className="flex flex-col gap-4 rounded-xl border border-border p-4">
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex gap-3">

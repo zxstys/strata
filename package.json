@@ -1,6 +1,6 @@
 {
   "name": "strata",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -17,6 +17,8 @@
     "next": "16.4.3",
     "next-cloudinary": "^7.0.0",
     "pg": "^8.23.1",
+    "pusher": "^5.3.4",
+    "pusher-js": "^8.6.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-icons": "^5.7.0",

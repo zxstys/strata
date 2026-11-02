@@ -12,6 +12,9 @@ import type { PostComment } from "@/types/comment";
 import Link from "next/link";
 import { useState } from "react";
 import { LuTrash2 } from "react-icons/lu";
+import MentionTextarea from "./MentionTextarea";
+import { linkifyText } from "./Linkify";
+import ReplyForm from "./comments/ReplyForm";
 
 const MAX_LENGTH = 500;
 const MAX_GIF_BYTES = 5 * 1024 * 1024;
@@ -72,49 +75,13 @@ export default function CommentSection({ postUuid }: { postUuid: string }) {
         }
     };
 
+    const onReplyPosted = () =>
+        Promise.all([mutate(), adjustCommentCount(postUuid, +1)]);
+
     return (
         <section className="-mx-4 mt-3 border-t border-border">
             {session ? (
-                <form onSubmit={submit} className="flex gap-3 border-b border-border px-4 py-3">
-                    <Avatar name={session.user.name} src={session.user.image} />
-                    <div className="flex min-w-0 flex-1 flex-col gap-2">
-                        <textarea
-                            value={draft}
-                            onChange={(e) => setDraft(e.target.value)}
-                            maxLength={MAX_LENGTH}
-                            rows={2}
-                            placeholder="Post your reply"
-                            className="w-full p-4 resize-none bg-transparent text-sm placeholder:text-muted-foreground focus:outline-none"
-                        />
-
-                        <MediaInput
-                            accept="image/gif"
-                            file={gif}
-                            onChange={setGif}
-                            label="Add GIF"
-                        />
-
-                        <div className="flex items-center justify-end gap-3">
-                            {draft.length > 0 && (
-                                <span
-                                    className={`text-xs ${draft.length > MAX_LENGTH - 50
-                                        ? "text-destructive"
-                                        : "text-muted-foreground"
-                                        }`}
-                                >
-                                    {MAX_LENGTH - draft.length}
-                                </span>
-                            )}
-                            <button
-                                type="submit"
-                                disabled={!canSubmit}
-                                className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
-                            >
-                                {submitting ? "Replying..." : "Reply"}
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                <ReplyForm postUuid={postUuid} onPosted={onReplyPosted} />
             ) : (
                 <div className="border-b border-border px-4 py-4 text-center text-sm text-muted-foreground">
                     <Link href="/auth/login" className="font-medium text-foreground hover:underline">
@@ -180,7 +147,7 @@ export default function CommentSection({ postUuid }: { postUuid: string }) {
 
                         {c.content && (
                             <p className="mt-0.5 whitespace-pre-wrap break-words text-sm leading-relaxed">
-                                {c.content}
+                                {linkifyText(c.content)}
                             </p>
                         )}
 

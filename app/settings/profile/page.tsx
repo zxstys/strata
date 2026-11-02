@@ -1,27 +1,25 @@
 // app/settings/profile/page.tsx
 "use client";
 
-import { useRouter } from "next/navigation";
-import { LuArrowLeft, LuBadgeCheck } from "react-icons/lu";
-
 import Avatar from "@/components/Avatar";
 import ImageEditor from "@/components/ImageEditor";
+import { api } from "@/lib/api/api";
 import { authClient } from "@/lib/auth/auth-client";
-import { fetcher } from "@/lib/api/fetcher";
+import dynamic from "next/dynamic";
 import { profilePath } from "@/lib/post/profile-link";
 import { uploadMedia } from "@/lib/post/upload-client";
+import { useApi } from "@/lib/api/use-api";
 import { normalizeUsername, validateUsername } from "@/lib/user/username";
 import type { MyProfile } from "@/types/user";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import useSWR from "swr";
 
 const ABOUT_MAX = 160;
 type MediaKind = "avatar" | "banner";
 
 export default function EditProfilePage() {
     const { data: session } = authClient.useSession();
-    const { data: me, error, mutate } = useSWR<MyProfile>("/api/profile", fetcher);
+    const { data: me, error, mutate } = useApi<MyProfile>("/api/profile");
 
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
@@ -29,7 +27,6 @@ export default function EditProfilePage() {
     const [saving, setSaving] = useState(false);
     const [editing, setEditing] = useState<{ kind: MediaKind; file: File } | null>(null);
     const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
-    const router = useRouter();
 
     useEffect(() => {
         if (me) {
@@ -40,20 +37,13 @@ export default function EditProfilePage() {
     }, [me]);
 
     const patch = async (body: Record<string, unknown>) => {
-        const res = await fetch("/api/profile", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.message ?? "Something went wrong.");
+        await api.patch("/api/profile", body);
         await mutate();
     };
 
-    // Called when the user picks a file. Opens the editor instead of uploading.
     const pick = (kind: MediaKind, e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        e.target.value = ""; // lets the same file be picked again
+        e.target.value = "";
         if (!file) return;
 
         if (!file.type.startsWith("image/")) {
@@ -65,12 +55,9 @@ export default function EditProfilePage() {
         setEditing({ kind, file });
     };
 
-    // Called by the editor with the cropped JPEG. Throwing keeps the editor open with the error.
     const applyMedia = async (kind: MediaKind, cropped: File) => {
         const url = await uploadMedia(cropped, kind);
-
-        // The API stores the avatar in the `image` column, so map the key explicitly.
-        await patch(kind === "avatar" ? { image: url } : { banner: url });
+        await patch({ [kind]: url });
 
         authClient.$store.notify("$sessionSignal");
 
@@ -120,30 +107,7 @@ export default function EditProfilePage() {
     const publicHref = profilePath({ id: session?.user.id ?? "", username: me.username });
 
     return (
-        <div className="flex flex-col gap-6 max-w-xl mx-auto my-8">
-            <div className="flex items-center justify-between gap-3">
-                <button
-                    type="button"
-                    onClick={() => {
-                        // Go back in history if possible, otherwise open the public profile.
-                        if (window.history.length > 1) router.back();
-                        else router.push(publicHref);
-                    }}
-                    className="flex items-center gap-2 rounded-full px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-hover hover:text-foreground"
-                >
-                    <LuArrowLeft className="size-4" />
-                    Back
-                </button>
-
-                <Link
-                    href="/settings/verification"
-                    className="flex items-center gap-2 rounded-full border border-border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-hover"
-                >
-                    <LuBadgeCheck className="size-4" />
-                    Verification
-                </Link>
-            </div>
-
+        <div className="flex flex-col gap-6 max-w-xl my-4 mx-auto">
             {editing && (
                 <ImageEditor
                     key={`${editing.kind}-${editing.file.name}-${editing.file.size}`}
@@ -212,13 +176,13 @@ export default function EditProfilePage() {
                 <label className="flex flex-col gap-1.5 text-sm font-medium">
                     Username
                     <div className="flex items-center rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-ring">
-                        <span className="pl-3 text-sm text-muted-foreground px-2">@</span>
+                        <span className="pl-3 text-sm text-muted-foreground">@</span>
                         <input
                             value={username}
                             maxLength={20}
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="your_name"
-                            className="h-10 w-full bg-transparent px-1 pr-3 border-0 ring-0 text-sm font-normal focus:outline-none"
+                            className="h-10 w-full border-0 bg-transparent px-1 pr-3 text-sm font-normal focus:outline-none"
                         />
                     </div>
                     <span className="text-xs font-normal text-muted-foreground">

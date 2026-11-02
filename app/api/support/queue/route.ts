@@ -22,12 +22,16 @@ export async function GET(request: NextRequest) {
     if (!staff) return forbidden();
 
     const filter = request.nextUrl.searchParams.get("status");
-    const where =
+    const userId = request.nextUrl.searchParams.get("userId")?.slice(0, 64) ?? null;
+
+    const statusWhere =
         filter === "all"
             ? undefined
             : filter && isTicketStatus(filter)
                 ? eq(supportTickets.status, filter)
                 : inArray(supportTickets.status, OPEN_STATUSES);
+
+    const where = and(statusWhere, userId ? eq(supportTickets.userId, userId) : undefined);
 
     const rows = await db
         .select({

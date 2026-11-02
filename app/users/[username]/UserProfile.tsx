@@ -2,6 +2,7 @@
 "use client";
 
 import Avatar from "@/components/Avatar";
+import MessageButton from "@/components/dm/MessageButton";
 import FollowButton from "@/components/FollowButton";
 import Nav from "@/components/Nav";
 import PostCard from "@/components/PostCard";
@@ -77,7 +78,8 @@ export default function UserProfile({
                                             Edit profile
                                         </Link>
                                     ) : session ? (
-                                        <div className="mb-1">
+                                        <div className="mb-1 flex items-center gap-2">
+                                            <MessageButton userId={data.user.id} />
                                             <FollowButton
                                                 userId={data.user.id}
                                                 following={data.user.isFollowing}

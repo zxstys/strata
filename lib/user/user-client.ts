@@ -1,8 +1,6 @@
 // lib/user-client.ts
-import { fetcher } from "@/lib/api/fetcher";
+import { useApi } from "@/lib/api/use-api";
 import type { UserPage } from "@/types/user";
-import useSWR from "swr";
-import { api } from "../api/api";
 
 export const useUser = (username: string) =>
-    useSWR<UserPage>(`/api/users/${encodeURIComponent(username)}`, api.get);
+    useApi<UserPage>(`/api/users/${encodeURIComponent(username)}`);

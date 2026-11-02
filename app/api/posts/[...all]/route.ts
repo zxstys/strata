@@ -1,4 +1,6 @@
 // app/api/posts/[...all]/route.ts
+
+import { syncCommentEntities, syncPostEntities } from "@/lib/text/sync";
 import { auth } from "@/lib/auth/auth";
 import { db } from "@/lib/db/db";
 import { commentQueryFields, isUuid, toComment } from "@/lib/comment/comment-query";
@@ -123,6 +125,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                 .values({ content: text, mediaUrl: mediaUrl ?? null, userId: me })
                 .returning({ uuid: posts.uuid });
 
+            await syncPostEntities(created.uuid, me, text);
+
             return NextResponse.json({ message: "ok", uuid: created.uuid }, { status: 201 });
         }
 
@@ -152,6 +156,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                 .update(posts)
                 .set({ content: text, editedAt: new Date() })
                 .where(and(eq(posts.uuid, uuid), eq(posts.userId, me)));
+
+            await syncPostEntities(uuid, me, text);
 
             return NextResponse.json({ message: "ok" }, { status: 200 });
         }
@@ -237,6 +243,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                 .insert(comments)
                 .values({ postUuid, userId: me, content: text, mediaUrl: mediaUrl ?? null })
                 .returning({ uuid: comments.uuid });
+
+            // Mentions and notifications are saved here. This is best-effort, so a
+            // failure won't stop the reply from being returned.
+            await syncCommentEntities(created.uuid, postUuid, me, text).catch((err) =>
+                console.error("[comment sync]", err)
+            );
 
             const [row] = await db
                 .select(commentQueryFields(me))

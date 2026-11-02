@@ -4,9 +4,10 @@ import type { PostComment } from "@/types/comment";
 import type { Post } from "@/types/post";
 import type { UserPage } from "@/types/user";
 import useSWR, { mutate } from "swr";
+import { useApi } from "../api/use-api";
 
 export const useComments = (postUuid: string | null) =>
-    useSWR<PostComment[]>(postUuid ? `/api/posts/comments/${postUuid}` : null);
+  useApi<PostComment[]>(postUuid ? `/api/posts/comments/${postUuid}` : null);
 
 export const commentClient = {
     create: (postUuid: string, content: string, mediaUrl?: string) =>

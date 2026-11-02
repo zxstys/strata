@@ -16,6 +16,8 @@ import {
     LuShieldCheck,
     LuUser,
 } from "react-icons/lu";
+import MessagesLink from "./dm/MessagesLink";
+import NotificationsLink from "./notify/NotificationsLink";
 
 type SessionData = typeof auth.$Infer.Session;
 
@@ -81,11 +83,11 @@ export default function Nav({
     };
 
     return (
-        <header className="sticky top-0 z-40 border-border bg-background/95 backdrop-blur">
-            <div
-                className={`mx-auto flex h-14 max-w-xl items-center gap-3 px-4 ${wide ? "lg:max-w-5xl" : ""
-                    }`}
-            >
+        <header
+            className={`sticky top-0 z-40 mx-auto w-full max-w-xl border-b border-border bg-background/95 backdrop-blur ${wide ? "lg:max-w-5xl" : ""
+                }`}
+        >
+            <div className="flex h-14 items-center gap-3 px-4">
                 <Link
                     href="/"
                     className="shrink-0 font-mono text-base font-semibold tracking-tight"
@@ -180,14 +182,19 @@ export default function Nav({
 
                 {user ? (
                     <div ref={menuRef} className="relative shrink-0">
-                        <button
-                            aria-label="Account menu"
-                            aria-expanded={menuOpen}
-                            onClick={() => setMenuOpen((open) => !open)}
-                            className="rounded-full ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
-                        >
-                            <Avatar name={user.name} src={user.image} />
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                aria-label="Account menu"
+                                aria-expanded={menuOpen}
+                                onClick={() => setMenuOpen((open) => !open)}
+                                className="rounded-full ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+                            >
+                                <Avatar name={user.name} src={user.image} />
+
+                            </button>
+                            <MessagesLink userId={user.id} />
+                            <NotificationsLink userId={user.id} />
+                        </div>
 
                         {menuOpen && (
                             <div className="absolute right-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-lg border border-border bg-background py-1 shadow-lg">

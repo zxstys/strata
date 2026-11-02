@@ -175,6 +175,131 @@ export const follows = pgTable(
   ]
 );
 
+export const conversations = pgTable(
+  "conversations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    // Sorted "userA:userB". The unique constraint allows one conversation per pair.
+    pairKey: text("pair_key").notNull().unique(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    lastMessageAt: timestamp("last_message_at").defaultNow().notNull(),
+  },
+  (t) => [index("conversations_last_message_idx").on(t.lastMessageAt)]
+);
+
+export const conversationMembers = pgTable(
+  "conversation_members",
+  {
+    conversationId: uuid("conversation_id")
+      .notNull()
+      .references(() => conversations.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    lastReadAt: timestamp("last_read_at"),
+  },
+  (t) => [
+    primaryKey({ columns: [t.conversationId, t.userId] }),
+    index("conv_members_user_idx").on(t.userId),
+  ]
+);
+
+export const messages = pgTable(
+  "messages",
+  {
+    // Generated in the browser, so a retry after a network error can't create a duplicate.
+    id: uuid("id").primaryKey(),
+    conversationId: uuid("conversation_id")
+      .notNull()
+      .references(() => conversations.id, { onDelete: "cascade" }),
+    senderId: text("sender_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    content: text("content").notNull(),
+    mediaUrl: text("media_url"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [index("messages_conv_created_idx").on(t.conversationId, t.createdAt)]
+);
+
+export const postTags = pgTable(
+  "post_tags",
+  {
+    postUuid: uuid("post_uuid")
+      .notNull()
+      .references(() => posts.uuid, { onDelete: "cascade" }),
+    tag: text("tag").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.postUuid, t.tag] }),
+    index("post_tags_tag_created_idx").on(t.tag, t.createdAt),
+  ]
+);
+
+export const supportMessages = pgTable(
+  "support_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ticketUuid: uuid("ticket_uuid")
+      .notNull()
+      .references(() => supportTickets.uuid, { onDelete: "cascade" }),
+    senderId: text("sender_id").references(() => user.id, { onDelete: "set null" }),
+    isStaff: boolean("is_staff").notNull().default(false),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [index("support_messages_ticket_idx").on(t.ticketUuid, t.createdAt)]
+);
+
+export const mentions = pgTable(
+  "mentions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    postUuid: uuid("post_uuid")
+      .notNull()
+      .references(() => posts.uuid, { onDelete: "cascade" }),
+    // Null for mentions in the post body, set for mentions in a reply.
+    commentUuid: uuid("comment_uuid").references(() => comments.uuid, {
+      onDelete: "cascade",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("mentions_user_idx").on(t.userId),
+    index("mentions_post_idx").on(t.postUuid),
+  ]
+);
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    actorId: text("actor_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    postUuid: uuid("post_uuid").references(() => posts.uuid, {
+      onDelete: "cascade",
+    }),
+    commentUuid: uuid("comment_uuid").references(() => comments.uuid, {
+      onDelete: "cascade",
+    }),
+    readAt: timestamp("read_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [index("notifications_user_created_idx").on(t.userId, t.createdAt)]
+);
+
 export const commentsRelations = relations(comments, ({ one }) => ({
   post: one(posts, { fields: [comments.postUuid], references: [posts.uuid] }),
   user: one(user, { fields: [comments.userId], references: [user.id] }),

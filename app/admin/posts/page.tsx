@@ -4,12 +4,11 @@
 
 import Avatar from "@/components/Avatar";
 import Pager from "@/components/admin/Pager";
-import { adminFetch } from "@/lib/admin/admin-client";
-import { fetcher } from "@/lib/api/fetcher";
+import { api } from "@/lib/api/api";
+import { useApi } from "@/lib/api/use-api";
 import type { Post } from "@/types/post";
 import Link from "next/link";
 import { useState } from "react";
-import useSWR from "swr";
 
 type PostsResponse = { posts: Post[]; hasMore: boolean };
 
@@ -20,7 +19,7 @@ export default function AdminPosts() {
     const [message, setMessage] = useState("");
 
     const key = `/api/admin/posts?q=${encodeURIComponent(q)}&page=${page}`;
-    const { data, error, isLoading, mutate } = useSWR<PostsResponse>(key, fetcher, {
+    const { data, error, isLoading, mutate } = useApi<PostsResponse>(key, {
         keepPreviousData: true,
     });
 
@@ -35,7 +34,7 @@ export default function AdminPosts() {
         setBusyId(p.uuid);
         setMessage("");
         try {
-            await adminFetch("/api/admin/posts", "DELETE", { uuid: p.uuid });
+            await api.del("/api/admin/posts", { uuid: p.uuid });
             await mutate();
             setMessage("Post deleted.");
         } catch (err) {
